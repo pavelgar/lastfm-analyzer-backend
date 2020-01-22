@@ -6,6 +6,8 @@ import mongoose from "mongoose"
 
 import middleware from "./utils/middleware"
 
+import loginRouter from "./controllers/login"
+
 const app = express()
 
 mongoose
@@ -24,10 +26,7 @@ app.use(
 )
 app.use(middleware.tokenExtractor)
 
-// Put routers here
-app.get("/", (req, res) => {
-  res.send("Hello World!")
-})
+app.use("/api/login", loginRouter)
 
 app.use(middleware.unknownEndpoint)
 app.use(middleware.errorHandler)
