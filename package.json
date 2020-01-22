@@ -8,7 +8,7 @@
   "private": true,
   "scripts": {
     "start": "node index.js",
-    "watch": "nodemon index.js"
+    "watch": "nodemon --exec babel-node index.js"
   },
   "dependencies": {
     "dotenv": "^8.2.0",
@@ -16,6 +16,8 @@
     "mongoose": "^5.8.9"
   },
   "devDependencies": {
+    "@babel/core": "^7.8.3",
+    "@babel/node": "^7.8.3",
     "nodemon": "^2.0.2"
   }
 }
