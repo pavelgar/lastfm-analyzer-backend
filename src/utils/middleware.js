@@ -24,4 +24,4 @@ const tokenExtractor = (req, res, next) => {
   next()
 }
 
-module.exports = { unknownEndpoint, errorHandler, tokenExtractor }
+export default { unknownEndpoint, errorHandler, tokenExtractor }
