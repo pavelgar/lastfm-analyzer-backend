@@ -26,6 +26,7 @@ router.post("/", async (req, res) => {
   }
 
   const api_sig = getSignature(payload, LASTFM_API_SECRET)
+
   try {
     // Get session
     const session = await axios.get(LASTFM_API_ROOT, {
@@ -34,11 +35,14 @@ router.post("/", async (req, res) => {
     const { key, name } = session.data.session
     const token = jwt.sign(key, JWT_SECRET)
 
-    // Create user if it doesn't exist yet
-    User.create({ username: name }, () => {})
+    const user = await User.findOneAndUpdate(
+      { name },
+      { $set: { name } },
+      { upsert: true, new: true }
+    )
 
     // Return signed token and username
-    res.status(200).send({ token, name })
+    res.status(200).send({ token, name, id: user._id })
   } catch (error) {
     console.log(error.response.data)
     res.status(403).end()

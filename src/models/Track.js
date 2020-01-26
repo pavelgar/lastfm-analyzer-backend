@@ -1,7 +1,7 @@
 import { Schema, model } from "mongoose"
 
 const schema = new Schema({
-  name: {
+  artist: {
     type: String,
     required: true,
     unique: true
@@ -9,13 +9,7 @@ const schema = new Schema({
   total_scrobbles: {
     type: Number,
     default: 0
-  },
-  tracks: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "Track"
-    }
-  ]
+  }
 })
 
-export default model("User", schema)
+export default model("Track", schema)

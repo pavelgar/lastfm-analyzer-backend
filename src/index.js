@@ -7,6 +7,7 @@ import mongoose from "mongoose"
 import middleware from "./utils/middleware"
 
 import loginRouter from "./controllers/login"
+import userRouter from "./controllers/user"
 
 const app = express()
 
@@ -30,6 +31,7 @@ app.use(
 app.use(middleware.tokenExtractor)
 
 app.use("/api/login", loginRouter)
+app.use("/api/users", userRouter)
 
 app.use(middleware.unknownEndpoint)
 app.use(middleware.errorHandler)
