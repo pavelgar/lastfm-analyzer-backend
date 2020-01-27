@@ -1,14 +1,16 @@
 import { Schema, model } from "mongoose"
 
 const schema = new Schema({
-  artist: {
-    type: String,
-    required: true,
-    unique: true
+  mbid: {
+    type: String, // mbid
+    required: true
   },
-  total_scrobbles: {
-    type: Number,
-    default: 0
+  name: String, // track name
+  artist: String, // artist name
+  album: String, // album name
+  date: {
+    type: Number, // scrobble timestamp
+    required: true
   }
 })
 

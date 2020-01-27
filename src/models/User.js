@@ -1,4 +1,5 @@
 import { Schema, model } from "mongoose"
+import Track from "./Track"
 
 const schema = new Schema({
   name: {
@@ -6,16 +7,7 @@ const schema = new Schema({
     required: true,
     unique: true
   },
-  total_scrobbles: {
-    type: Number,
-    default: 0
-  },
-  tracks: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "Track"
-    }
-  ]
+  tracks: [Track.schema]
 })
 
 export default model("User", schema)
