@@ -1,5 +1,4 @@
 import { Schema, model } from "mongoose"
-import Track from "./Track"
 
 const schema = new Schema({
   name: {
@@ -7,7 +6,7 @@ const schema = new Schema({
     required: true,
     unique: true
   },
-  tracks: [Track.schema]
+  tracks: [Map]
 })
 
 export default model("User", schema)

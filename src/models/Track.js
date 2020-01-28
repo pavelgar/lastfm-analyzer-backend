@@ -1,10 +1,7 @@
 import { Schema, model } from "mongoose"
 
 const schema = new Schema({
-  mbid: {
-    type: String, // mbid
-    required: true
-  },
+  mbid: String, // mbid
   name: String, // track name
   artist: String, // artist name
   album: String, // album name
