@@ -4,11 +4,20 @@ import { loadUserTracks, userGetInfo } from "../utils/api"
 
 var router = Router()
 
-router.get("/:id/scrobble/counts", async (req, res) => {
+router.get("/:id/scrobbles", async (req, res) => {
   const { id } = req.params
   const user = await User.findById(id)
   if (!user) {
-    res.status(403).send({ error: "User not found" })
+    res.status(404).json({ error: "User not found" })
+  } else {
+    res.json(user.tracks)
+  }
+})
+
+router.put("/:id/scrobbles", async (req, res) => {
+  const user = await User.findById(req.params.id)
+  if (!user) {
+    res.status(404).json({ error: "User not found" })
     return
   }
 
@@ -24,17 +33,34 @@ router.get("/:id/scrobble/counts", async (req, res) => {
       const newTracksMap = newTracks.map(
         track => new Map(Object.entries(track))
       )
-      user.tracks = newTracksMap.concat(user.tracks)
+      user.tracks.push({
+        $each: newTracksMap,
+        $position: 0
+      })
       user.save()
     }
-    res.status(200).send(newTracks)
+    res.status(200).json(newTracks)
   } catch (error) {
     if (error.response) {
-      res.status(error.response.status).send(error.response.data)
+      res.status(error.response.status).json(error.response.data)
     } else {
-      res.status(403).send({ error: "Something went wrong" })
+      console.log(error)
+      res.status(500).json({ error: "Something went wrong" })
     }
   }
+})
+
+router.delete("/:id/scrobbles", async (req, res) => {
+  User.findByIdAndUpdate(
+    req.params.id,
+    { $unset: { tracks: "" } },
+    { new: true },
+    (err, doc) => {
+      if (err) res.status(500).json({ error: "Something went wrong" })
+      else if (doc) res.json(doc)
+      else res.status(404).json({ error: "User not found" })
+    }
+  )
 })
 
 export default router
