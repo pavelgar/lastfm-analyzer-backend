@@ -27,6 +27,32 @@ export const authGetSession = async token => {
   return { token: jwt.sign(key, JWT_SECRET), name }
 }
 
+export const userGetInfo = async name => {
+  const params = {
+    api_key: LASTFM_API_KEY,
+    method: "user.getinfo",
+    format: "json",
+    user: name
+  }
+  const response = await axios.get(LASTFM_API_ROOT, { params })
+  return response.data.user
+}
+
+export const loadUserTracks = async (name, from = 0) => {
+  // Fetch first page to know how many pages to load
+  const firstPage = await userGetRecentTracks(name, from)
+  const { last } = firstPage.pages
+  if (last == 0 || last == 1) return firstPage.tracks
+
+  // Create a list of API calls
+  const pages = [...Array(last - 1).keys()] // Basically a range-function
+  const promises = pages.map(page => userGetRecentTracks(name, from, page + 2))
+
+  // Wait for all API calls to resolve
+  const data = await Promise.all([firstPage, ...promises])
+  return data.map(page => page.tracks).flat()
+}
+
 const userGetRecentTracks = async (name, from, page = 1) => {
   const params = {
     api_key: LASTFM_API_KEY,
@@ -63,28 +89,5 @@ const userGetRecentTracks = async (name, from, page = 1) => {
   return {
     tracks: mappedTracks,
     pages: { current: parseInt(attr.page), last: parseInt(attr.totalPages) }
-  }
-}
-
-export const loadUserTracks = async (name, from = 0) => {
-  try {
-    // Fetch first page to know how many pages to load
-    const firstPage = await userGetRecentTracks(name, from)
-    const { last } = firstPage.pages
-    if (last == 0 || last == 1) return firstPage.tracks
-
-    // Create a list of API calls
-    const pages = [...Array(last - 1).keys()] // Basically a range-function
-    const promises = pages.map(page =>
-      userGetRecentTracks(name, from, page + 2)
-    )
-
-    // Wait for all API calls to resolve
-    const data = await Promise.all([firstPage, ...promises])
-    return data.map(page => page.tracks).flat()
-  } catch (error) {
-    // This can happen if we hit the LastFM API call limit
-    console.log(error)
-    return null
   }
 }

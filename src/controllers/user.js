@@ -1,7 +1,6 @@
 import { Router } from "express"
 import User from "../models/User"
-import Track from "../models/Track"
-import { loadUserTracks } from "../utils/api"
+import { loadUserTracks, userGetInfo } from "../utils/api"
 
 var router = Router()
 
@@ -13,17 +12,29 @@ router.get("/:id/scrobble/counts", async (req, res) => {
     return
   }
 
-  const newTracks = user.tracks.length
-    ? await loadUserTracks(user.name, user.tracks[0].get("date") + 1)
-    : await loadUserTracks(user.name, 1580128907)
+  try {
+    const newTracks = user.tracks.length
+      ? await loadUserTracks(user.name, user.tracks[0].get("date") + 1)
+      : await loadUserTracks(user.name)
 
-  if (newTracks.length) {
-    const newTracksMap = newTracks.map(track => new Map(Object.entries(track)))
-    user.tracks = newTracksMap.concat(user.tracks)
-    user.save()
+    // TODO: Detect deleted scrobbles and remove those from the database
+    // Use userGetInfo(user.name) to get up-to-date scrobble count.
+
+    if (newTracks.length) {
+      const newTracksMap = newTracks.map(
+        track => new Map(Object.entries(track))
+      )
+      user.tracks = newTracksMap.concat(user.tracks)
+      user.save()
+    }
+    res.status(200).send(newTracks)
+  } catch (error) {
+    if (error.response) {
+      res.status(error.response.status).send(error.response.data)
+    } else {
+      res.status(403).send({ error: "Something went wrong" })
+    }
   }
-
-  res.status(200).send(newTracks)
 })
 
 export default router
