@@ -1,11 +1,9 @@
 import md5 from "md5"
-import jwt from "jsonwebtoken"
 import axios from "axios"
 
 const LASTFM_API_KEY = process.env.LASTFM_API_KEY
 const LASTFM_API_SECRET = process.env.LASTFM_API_SECRET
 const LASTFM_API_ROOT = process.env.LASTFM_API_ROOT
-const JWT_SECRET = process.env.JWT_SECRET
 
 const getSignature = (params, secret) => {
   const signature = Object.entries(params)
@@ -24,7 +22,7 @@ export const authGetSession = async token => {
     params: { ...params, format: "json", api_sig }
   })
   const { key, name } = response.data.session
-  return { token: jwt.sign(key, JWT_SECRET), name }
+  return { key, name }
 }
 
 export const userGetInfo = async name => {
