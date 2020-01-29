@@ -32,10 +32,18 @@ router.post("/", async (req, res) => {
 
 router.post("/verify", async (req, res) => {
   const { token } = req.body
-  if (!token) res.status(400).json({ error: "Token not provided" })
-  const decoded = jwt.verify(token, JWT_SECRET)
-  console.log(decoded)
-  res.status(204).end()
+  if (!token) {
+    res.status(400).json({ error: "Token not provided" })
+    return
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET)
+    // Maybe check if the decoded token is still valid in LastFM API
+    res.status(204).end()
+  } catch (error) {
+    res.status(403).json({ error: "Malformed token" })
+  }
 })
 
 export default router
